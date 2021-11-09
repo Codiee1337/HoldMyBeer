@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,14 +29,28 @@ namespace ConsoleApp2
         /// </summary>
         public static void GenerateXNumberOfRandomImage(int count)
         {
-            List<Bitmap> asd = new List<Bitmap>();
+            List<String> subFolders = new List<String>();
+           
+            String originalPath = Directory.GetCurrentDirectory();
+
+            for(int i = 0; i < rand.Next(4,8); i++)
+            {
+                string pathString = System.IO.Path.Combine(originalPath, getRandomDirectoryName(8));
+                subFolders.Add(pathString);
+                System.IO.Directory.CreateDirectory(pathString);
+            }
+
+            subFolders.Add(originalPath);
 
             var result = Parallel.For(1, count, (i, state) =>
             {
                 Console.WriteLine($"Beginning iteration {i}");
 
+                int randomForWhichDirectory = rand.Next(0, subFolders.Count());
 
-                RandomImageGenerator().Save(new StringBuilder().Append(RandomString(rand.Next(1, 10))).Append(i).Append(ChooseYourSide()).ToString());
+                
+
+                RandomImageGenerator().Save(subFolders.ElementAt(randomForWhichDirectory) + "/"+new StringBuilder().Append(Path.GetRandomFileName()).Append(i).Append(ChooseYourSide()).ToString());
 
 
 
@@ -70,6 +85,12 @@ namespace ConsoleApp2
               .Select(s => s[rand.Next(s.Length)]).ToArray());
         }
         
+        public static string getRandomDirectoryName(int length) 
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[rand.Next(s.Length)]).ToArray());
+        }
 
         public static string ChooseYourSide()
         {
